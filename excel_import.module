@@ -1,0 +1,184 @@
+<?php
+
+/**
+ * @file
+ * Provides import functionality for all entity types, from excel files.
+ */
+use Drupal\excel_import\Entity\ImportFileEntity;
+use Drupal\excel_import\Entity\ImportTypeEntity;
+
+/**
+ * Implements hook_menu().
+ */
+function excel_import_menu() {
+
+  $items['admin/content/import'] = [
+    'title' => 'Excel Import',
+    'description' => 'Import excel files into different entities.',
+    'position' => 'right',
+    'weight' => -8,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => ['import excel files'],
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  ];
+
+  $import_types = ImportTypeEntity::getAllEntities();
+
+  foreach ($import_types as $import_type) {
+    $type_url_str = excel_import_machine_name($import_type->title);
+    $items['admin/content/import/' . $type_url_str] = [
+      'title' => ucfirst($import_type->title),
+      'title callback' => 'check_plain',
+      'page callback' => 'excel_import_import_page',
+      'page arguments' => [$import_type],
+      'access arguments' => ['import excel files'],
+    ];
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function excel_import_permission() {
+  return [
+    'import excel files' => [
+      'title' => t('Import excel files'),
+    ],
+  ];
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function excel_import_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to add import type on 'admin/content/import' page.
+  if ($root_path == 'admin/content/import') {
+    $item = menu_get_item('admin/structure/entity-type/' . ImportTypeEntity::ENTITY_TYPE . '/' . ImportTypeEntity::BUNDLE . '/add');
+    $item['localized_options']['query']['destination'] = 'admin/content/import';
+    if ($item['access']) {
+      $data['actions']['output'][] = [
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      ];
+    }
+  }
+}
+
+/**
+ * Create a machine name from user input.
+ *
+ * @param $string
+ * @return string
+ */
+function excel_import_machine_name($string) {
+  return strtolower(preg_replace('/[^a-zA-Z0-9-]+/', '-', $string));
+}
+
+function excel_import_import_page($import_type) {
+  $return = [];
+
+  $entity = entity_create(ImportFileEntity::ENTITY_TYPE, ['type' => ImportFileEntity::BUNDLE]);
+  $form = drupal_get_form('eck__entity__form_add_' . ImportFileEntity::ENTITY_TYPE . '_' . ImportFileEntity::BUNDLE, $entity, $import_type);
+
+  $return['add_form'] = [
+    '#theme' => 'fieldset',
+    '#children' => drupal_render($form),
+    '#title' => t('+ Upload file for import'),
+    '#attributes' => [
+      'class' => ['import-file-add-fieldset', 'collapsible', 'collapsed'],
+    ],
+    '#attached' => [
+      'library' => [['system', 'drupal.collapse']],
+    ],
+  ];
+
+  $return['listing'] = ['#markup' => views_embed_view('excel_import', 'default', $import_type->id)];
+
+  return $return;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function excel_import_form_alter(&$form, &$form_state, $form_id) {
+  // Alter import file entity add forms.
+  if ($form_id === 'eck__entity__form_add_' . ImportFileEntity::ENTITY_TYPE . '_' . ImportFileEntity::BUNDLE) {
+    excel_import_alter_import_file_add_form($form, $form_state, $form_id);
+  }
+
+  // Alter import type entity add forms.
+  if ($form_id === 'eck__entity__form_add_' . ImportTypeEntity::ENTITY_TYPE . '_' . ImportTypeEntity::BUNDLE) {
+    excel_import_alter_import_type_add_form($form, $form_state, $form_id);
+  }
+}
+
+/**
+ * Alter the add form for the import file entity.
+ *
+ * @param $form
+ * @param $form_state
+ * @param $form_id
+ */
+function excel_import_alter_import_file_add_form(&$form, &$form_state, $form_id) {
+  // Get a shortcut to the import file being created, and a wrapper for it.
+  $entity = &$form_state[ImportFileEntity::ENTITY_TYPE];
+  $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $entity);
+
+  // Set the status as not imported, and hide it from the form.
+  unset($form['field_import_status']);
+  $wrapper->field_import_status->set('imported');
+
+  $form['title']['#access'] = FALSE;
+
+  // We only hide the import type field if we have an import type provided.
+  $import_type = isset($form_state['build_info']['args'][1]) ? $form_state['build_info']['args'][1] : NULL ;
+  if (is_object($import_type) &&
+    isset($import_type->type) &&
+    $import_type->type == ImportTypeEntity::BUNDLE) {
+
+    // Hide the import type field, and set it to the provided import type.
+    unset($form['field_import_type']);
+    $wrapper->field_import_type->set($import_type->id);
+  }
+}
+/**
+ * Alter the add form for the import type entity.
+ *
+ * @param $form
+ * @param $form_state
+ * @param $form_id
+ */
+function excel_import_alter_import_type_add_form(&$form, &$form_state, $form_id) {
+  // Rebuild the menu after submission, a new menu route will be added for the
+  // new import type under admin/content/import.
+  $form['#submit'][] = 'menu_rebuild';
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function excel_import_entity_presave($entity, $type) {
+  if ($type == ImportFileEntity::ENTITY_TYPE &&
+    (!isset($entity->title) || empty($entity->title))) {
+
+    $wraper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $entity);
+    $file_value = $wraper->field_import_file->value();
+    $file = file_load($file_value['fid']);
+    $wraper->title->set($file->filename);
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function excel_import_views_api() {
+  return [
+    'api' => 3,
+    'path' => drupal_get_path('module', 'excel_import') . '/includes/views',
+    'template path' => drupal_get_path('module', 'excel_import') . '/themes',
+  ];
+}

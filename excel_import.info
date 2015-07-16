@@ -1,0 +1,12 @@
+name = Excel Import
+description = Import entities from excel files, using an Ui for mapping columns to fields.
+package = Import
+core = 7.x
+
+dependencies[] = eck
+dependencies[] = xautoload
+dependencies[] = entity_type_bundle_field
+
+; Views integration files
+files[] = includes/views/handlers/excel_import_views_handler_field_link_review.inc
+files[] = includes/views/handlers/excel_import_views_handler_field_link_import.inc

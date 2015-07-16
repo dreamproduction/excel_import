@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the excel_import module.
+ */
+use Drupal\excel_import\Entity\ImportFileEntity;
+use Drupal\excel_import\Entity\ImportTypeEntity;
+use Drupal\excel_import\Entity\MappingEntity;
+
+/**
+ * Implements hook_enable().
+ */
+function excel_import_enable() {
+  $entity = new ImportTypeEntity();
+  $entity->ensureEntityTypeCreated();
+
+  $entity = new ImportFileEntity();
+  $entity->ensureEntityTypeCreated();
+
+  $entity = new MappingEntity();
+  $entity->ensureEntityTypeCreated();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function excel_import_uninstall() {
+  // Use our autoloader, xautoload will not work at uninstall, as the module is
+  // not enabled.
+  $dirname = dirname(__FILE__);
+  require_once $dirname . '/includes/excel_import.autoload.inc';
+  excel_import_include();
+
+//  drupal_load('module', 'eck');
+
+  $entity = new ImportTypeEntity();
+  $entity->ensureEntityTypeDeleted();
+
+  $entity = new ImportFileEntity();
+  $entity->ensureEntityTypeDeleted();
+
+  $entity = new MappingEntity();
+  $entity->ensureEntityTypeDeleted();
+
+}
