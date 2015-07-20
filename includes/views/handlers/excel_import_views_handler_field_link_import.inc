@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Field handler to present a link to editt the entity content.
+ * Field handler to present a link to import the file content.
  */
 
 // @codingStandardsIgnoreStart

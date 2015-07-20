@@ -5,7 +5,9 @@ core = 7.x
 
 dependencies[] = eck
 dependencies[] = xautoload
+dependencies[] = composer_manager
 dependencies[] = entity_type_bundle_field
+dependencies[] = mapping_field
 
 ; Views integration files
 files[] = includes/views/handlers/excel_import_views_handler_field_link_review.inc

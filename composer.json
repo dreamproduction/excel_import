@@ -1,0 +1,20 @@
+{
+  "name": "dreamproduction/excel_import",
+  "description": "Drupal module for importing entities from an excel file, with a UI for managing import files and mapping.",
+  "keywords": ["PHP","Excel","Import","Drupal","xls","xlsx"],
+  "homepage": "https://github.com/dreamproduction/excel_import",
+  "type": "library",
+  "license": "LGPL",
+  "authors": [
+    {
+      "name": "Marian Calin",
+      "homepage": "http://mariancalin.ro"
+    },
+    {
+      "name": "Adina Chimniuc"
+    }
+  ],
+  "require": {
+    "phpoffice/phpexcel": "*"
+  }
+}

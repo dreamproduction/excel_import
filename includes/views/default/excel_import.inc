@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains a view listing the import files for an import type.
+ */
+
 $view = new view();
 $view->name = 'excel_import';
 $view->description = '';

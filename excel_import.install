@@ -26,13 +26,12 @@ function excel_import_enable() {
  * Implements hook_uninstall().
  */
 function excel_import_uninstall() {
-  // Use our autoloader, xautoload will not work at uninstall, as the module is
-  // not enabled.
+  // Register out fallback autoloader, Xautoload will not autoload our classes
+  // at uninstall, as the module is not enabled.
+  // This is by design, see https://www.drupal.org/node/1937970
   $dirname = dirname(__FILE__);
   require_once $dirname . '/includes/excel_import.autoload.inc';
-  excel_import_include();
-
-//  drupal_load('module', 'eck');
+  excel_import_register_fallback_autoloader();
 
   $entity = new ImportTypeEntity();
   $entity->ensureEntityTypeDeleted();

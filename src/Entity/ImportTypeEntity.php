@@ -87,6 +87,26 @@ class ImportTypeEntity extends BaseEntity{
           'default_value' => [['value' => 'skip']],
         ],
       ],
+      'field_mapping_type' => [
+        'type' => 'list_text',
+        'field' => [
+          'field_name' => 'field_mapping_type',
+          'settings' => [
+            'allowed_values' => [
+              'columns' => 'Columns (Numeric)',
+              'header' => 'Header (The text in the first row of the file)',
+            ],
+          ],
+        ],
+        'instance' => [
+          'label' => 'Mapping based on',
+          'required' => TRUE,
+          'widget' => [
+            'type' => ' options_buttons',
+          ],
+          'default_value' => [['value' => 'header']],
+        ],
+      ],
     ];
   }
 

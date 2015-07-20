@@ -1,12 +1,14 @@
 <?php
 
 /**
- * Register a dedicated class loader only for the pourpose of uninstalling.
- *
- * Xautoload will not autoload our classes at uninstall, as the module is not
- * enabled. This is by design, see https://www.drupal.org/node/1937970
+ * @file
+ * Provides a fallback class autoloader.
  */
-function excel_import_include() {
+
+/**
+ * Register a fallback class loader.
+ */
+function excel_import_register_fallback_autoloader() {
   static $first_run = TRUE;
   if (!$first_run) {
     return;

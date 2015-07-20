@@ -6,6 +6,7 @@
  */
 use Drupal\excel_import\Entity\ImportFileEntity;
 use Drupal\excel_import\Entity\ImportTypeEntity;
+use Drupal\excel_import\Entity\MappingEntity;
 
 /**
  * Implements hook_menu().
@@ -31,13 +32,56 @@ function excel_import_menu() {
     $items['admin/content/import/' . $type_url_str] = [
       'title' => ucfirst($import_type->title),
       'title callback' => 'check_plain',
-      'page callback' => 'excel_import_import_page',
+      'page callback' => 'excel_import__import_overview_page',
       'page arguments' => [$import_type],
       'access arguments' => ['import excel files'],
+      'file' => 'excel_import.pages.inc',
+      'file path' => drupal_get_path('module', 'excel_import') . '/includes',
+    ];
+
+    $items['admin/content/import/' . $type_url_str . '/mapping'] = [
+      'title' => 'Add mapping',
+      'title callback' => 'check_plain',
+      'page callback' => 'excel_import__mapping_page',
+      'page arguments' => [$import_type],
+      'access arguments' => ['import excel files'],
+      'file' => 'excel_import.pages.inc',
+      'file path' => drupal_get_path('module', 'excel_import') . '/includes',
+      'type' => MENU_LOCAL_ACTION,
     ];
   }
 
+  $items['admin/content/import/%import_file/review'] = [
+    'title' => 'Review sheet',
+    'page callback' => 'excel_import__review_page',
+    'page arguments' => [3],
+    'access arguments' => ['import excel files'],
+    'type' => MENU_CALLBACK,
+    'file' => 'excel_import.pages.inc',
+    'file path' => drupal_get_path('module', 'excel_import') . '/includes',
+  ];
+
+  $items['admin/content/import/%import_file/import'] = [
+    'title' => 'Review sheet',
+    'page callback' => 'excel_import__import_page',
+    'page arguments' => [3],
+    'access arguments' => ['import excel files'],
+    'type' => MENU_CALLBACK,
+    'file' => 'excel_import.pages.inc',
+    'file path' => drupal_get_path('module', 'excel_import') . '/includes',
+  ];
+
   return $items;
+}
+
+/**
+ * Load callback for import file entity.
+ *
+ * @param $id
+ * @return mixed
+ */
+function import_file_load($id) {
+  return entity_load_single(ImportFileEntity::ENTITY_TYPE, $id);
 }
 
 /**
@@ -69,93 +113,29 @@ function excel_import_menu_local_tasks_alter(&$data, $router_item, $root_path) {
 }
 
 /**
- * Create a machine name from user input.
- *
- * @param $string
- * @return string
- */
-function excel_import_machine_name($string) {
-  return strtolower(preg_replace('/[^a-zA-Z0-9-]+/', '-', $string));
-}
-
-function excel_import_import_page($import_type) {
-  $return = [];
-
-  $entity = entity_create(ImportFileEntity::ENTITY_TYPE, ['type' => ImportFileEntity::BUNDLE]);
-  $form = drupal_get_form('eck__entity__form_add_' . ImportFileEntity::ENTITY_TYPE . '_' . ImportFileEntity::BUNDLE, $entity, $import_type);
-
-  $return['add_form'] = [
-    '#theme' => 'fieldset',
-    '#children' => drupal_render($form),
-    '#title' => t('+ Upload file for import'),
-    '#attributes' => [
-      'class' => ['import-file-add-fieldset', 'collapsible', 'collapsed'],
-    ],
-    '#attached' => [
-      'library' => [['system', 'drupal.collapse']],
-    ],
-  ];
-
-  $return['listing'] = ['#markup' => views_embed_view('excel_import', 'default', $import_type->id)];
-
-  return $return;
-}
-
-/**
  * Implements hook_form_alter().
  */
 function excel_import_form_alter(&$form, &$form_state, $form_id) {
   // Alter import file entity add forms.
   if ($form_id === 'eck__entity__form_add_' . ImportFileEntity::ENTITY_TYPE . '_' . ImportFileEntity::BUNDLE) {
+    module_load_include('inc', 'excel_import', 'includes/excel_import.form_alter');
     excel_import_alter_import_file_add_form($form, $form_state, $form_id);
   }
 
   // Alter import type entity add forms.
   if ($form_id === 'eck__entity__form_add_' . ImportTypeEntity::ENTITY_TYPE . '_' . ImportTypeEntity::BUNDLE) {
+    module_load_include('inc', 'excel_import', 'includes/excel_import.form_alter');
     excel_import_alter_import_type_add_form($form, $form_state, $form_id);
   }
-}
 
-/**
- * Alter the add form for the import file entity.
- *
- * @param $form
- * @param $form_state
- * @param $form_id
- */
-function excel_import_alter_import_file_add_form(&$form, &$form_state, $form_id) {
-  // Get a shortcut to the import file being created, and a wrapper for it.
-  $entity = &$form_state[ImportFileEntity::ENTITY_TYPE];
-  $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $entity);
-
-  // Set the status as not imported, and hide it from the form.
-  unset($form['field_import_status']);
-  $wrapper->field_import_status->set('imported');
-
-  $form['title']['#access'] = FALSE;
-
-  // We only hide the import type field if we have an import type provided.
-  $import_type = isset($form_state['build_info']['args'][1]) ? $form_state['build_info']['args'][1] : NULL ;
-  if (is_object($import_type) &&
-    isset($import_type->type) &&
-    $import_type->type == ImportTypeEntity::BUNDLE) {
-
-    // Hide the import type field, and set it to the provided import type.
-    unset($form['field_import_type']);
-    $wrapper->field_import_type->set($import_type->id);
+  // Alter mapping entity add forms.
+  if ($form_id === 'eck__entity__form_add_' . MappingEntity::ENTITY_TYPE . '_' . MappingEntity::BUNDLE) {
+    module_load_include('inc', 'excel_import', 'includes/excel_import.form_alter');
+    excel_import_alter_mapping_add_form($form, $form_state, $form_id);
   }
-}
-/**
- * Alter the add form for the import type entity.
- *
- * @param $form
- * @param $form_state
- * @param $form_id
- */
-function excel_import_alter_import_type_add_form(&$form, &$form_state, $form_id) {
-  // Rebuild the menu after submission, a new menu route will be added for the
-  // new import type under admin/content/import.
-  $form['#submit'][] = 'menu_rebuild';
+
+  // @TODO: Add alter for mapping edit form.
+
 }
 
 /**
@@ -170,6 +150,14 @@ function excel_import_entity_presave($entity, $type) {
     $file = file_load($file_value['fid']);
     $wraper->title->set($file->filename);
   }
+
+  if ($type == MappingEntity::ENTITY_TYPE &&
+    (!isset($entity->title) || empty($entity->title))) {
+
+    $wraper = entity_metadata_wrapper(MappingEntity::ENTITY_TYPE, $entity);
+    $import_type_title = $wraper->field_import_type->title->value();
+    $wraper->title->set(format_string('Mapping for @title', ['@title' => $import_type_title]));
+  }
 }
 
 /**
@@ -181,4 +169,28 @@ function excel_import_views_api() {
     'path' => drupal_get_path('module', 'excel_import') . '/includes/views',
     'template path' => drupal_get_path('module', 'excel_import') . '/themes',
   ];
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function excel_import_ctools_plugin_directory($owner, $plugin_type) {
+  switch ("$owner:$plugin_type") {
+    case 'mapping_field:mapping_source':
+    case 'mapping_field:mapping_destination':
+      return "plugins/$owner/$plugin_type";
+  }
+
+  return NULL;
+}
+
+
+/**
+ * Create a machine name from user input.
+ *
+ * @param $string
+ * @return string
+ */
+function excel_import_machine_name($string) {
+  return strtolower(preg_replace('/[^a-zA-Z0-9-]+/', '-', $string));
 }

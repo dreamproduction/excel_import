@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Provide additional Views fields for entity content.
+ * Provide views data and handlers for excel_import module.
  */
 use Drupal\excel_import\Entity\ImportFileEntity;
 

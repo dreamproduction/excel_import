@@ -104,7 +104,7 @@ abstract class BaseEntity {
   }
 
   /**
-   * Ensure the entity_type, bunsle and fields are created.
+   * Ensure the entity_type, bundle and fields are created.
    */
   public function ensureEntityTypeCreated() {
     $this->createEntityType();

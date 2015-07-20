@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Provides default views implemented by the excel_import module.
+ */
+
+/**
  * Implements hook_views_default_views().
  */
 function excel_import_views_default_views() {

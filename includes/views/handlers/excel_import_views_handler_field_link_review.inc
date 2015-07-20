@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Field handler to present a link to delete the entity content.
+ * Field handler to present a link to review the import file content.
  */
 
 // @codingStandardsIgnoreStart
