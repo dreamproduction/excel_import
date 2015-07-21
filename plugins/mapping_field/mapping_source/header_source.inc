@@ -7,8 +7,8 @@
  * @ingroup CToolsPlugin CToolsPluginMappingType
  */
 
-$plugin = array(
+$plugin = [
   'title' => t('Mapping source: Header'),
   'description' => t('Mapping plugin for header source.'),
   'class' => 'Drupal\excel_import\MappingSource\Header',
-);
+];

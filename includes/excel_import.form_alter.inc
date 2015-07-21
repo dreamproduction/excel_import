@@ -61,7 +61,7 @@ function excel_import_alter_import_type_add_form(&$form, &$form_state, $form_id)
 function excel_import_alter_mapping_add_form(&$form, &$form_state, $form_id) {
   $args = $form_state['build_info']['args'];
 
-  // Get a shortcut to the import file being created, and a wrapper for it.
+  // Get a shortcut to the mapping entity being created, and a wrapper for it.
   $entity = &$form_state[MappingEntity::ENTITY_TYPE];
   $wrapper = entity_metadata_wrapper(MappingEntity::ENTITY_TYPE, $entity);
 

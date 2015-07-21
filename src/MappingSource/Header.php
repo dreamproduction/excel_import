@@ -27,7 +27,7 @@ class Header extends BaseSource {
     return[
       '#type' => 'select',
       '#title' => t('Source'),
-      '#options' => ['_none' => t('Select a column')] + $this->getHeader(),
+      '#options' => ['_none' => t('Select a column')] + array_combine($this->getHeader(), $this->getHeader()),
       '#default_value' => $default_value,
       '#states' => $states,
     ];

@@ -65,6 +65,7 @@ class MappingEntity extends BaseEntity {
           ],
         ],
       ],
+      // @TODO: add field_mapping definition.
     ];
   }
 }

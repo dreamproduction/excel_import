@@ -72,9 +72,10 @@ class ImportTypeEntity extends BaseEntity{
           'field_name' => 'field_import_existing',
           'settings' => [
             'allowed_values' => [
-              'skip' => 'Skip',
-              'overwrite' => 'Overwrite (delete and create from scratch)',
-              'append' => 'Append (overwrite just the values present in the import)',
+              'Drupal\excel_import\Importer\SkipExisting' => 'Skip (do not import)',
+              'Drupal\excel_import\Importer\ReplaceExisting' => 'Replace (delete and create from scratch)',
+              'Drupal\excel_import\Importer\UpdateExisting' => 'Update (overwrite just the values present in the import)',
+              'Drupal\excel_import\Importer\DuplicateExisting' => 'Duplicate (just create a new entity for each row, without checking for existing entities)',
             ],
           ],
         ],

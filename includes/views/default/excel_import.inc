@@ -28,19 +28,19 @@ $handler->display->display_options['pager']['options']['offset'] = '0';
 $handler->display->display_options['pager']['options']['id'] = '0';
 $handler->display->display_options['pager']['options']['quantity'] = '9';
 $handler->display->display_options['style_plugin'] = 'table';
-$handler->display->display_options['style_options']['columns'] = array(
+$handler->display->display_options['style_options']['columns'] = [
   'id' => 'id',
-);
+];
 $handler->display->display_options['style_options']['default'] = '-1';
-$handler->display->display_options['style_options']['info'] = array(
-  'id' => array(
+$handler->display->display_options['style_options']['info'] = [
+  'id' => [
     'sortable' => 0,
     'default_sort_order' => 'asc',
     'align' => '',
     'separator' => '',
     'empty_column' => 0,
-  ),
-);
+  ],
+];
 $handler->display->display_options['style_options']['sticky'] = TRUE;
 /* Field: Import file: Id */
 $handler->display->display_options['fields']['id']['id'] = 'id';
@@ -82,10 +82,10 @@ $handler->display->display_options['arguments']['field_import_type_target_id']['
 $handler->display->display_options['filters']['type']['id'] = 'type';
 $handler->display->display_options['filters']['type']['table'] = 'eck_excel_import';
 $handler->display->display_options['filters']['type']['field'] = 'type';
-$handler->display->display_options['filters']['type']['value'] = array(
+$handler->display->display_options['filters']['type']['value'] = [
   'excel_import' => 'excel_import',
-);
-$translatables['excel_import'] = array(
+];
+$translatables['excel_import'] = [
   t('Master'),
   t('more'),
   t('Apply'),
@@ -109,4 +109,4 @@ $translatables['excel_import'] = array(
   t('Import'),
   t('Delete'),
   t('All'),
-);
+];

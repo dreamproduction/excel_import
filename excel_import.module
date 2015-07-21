@@ -40,10 +40,10 @@ function excel_import_menu() {
     ];
 
     $items['admin/content/import/' . $type_url_str . '/mapping'] = [
-      'title' => 'Add mapping',
+      'title' => 'Add/Edit mapping',
       'title callback' => 'check_plain',
       'page callback' => 'excel_import__mapping_page',
-      'page arguments' => [$import_type],
+      'page arguments' => [$import_type, 'admin/content/import/' . $type_url_str],
       'access arguments' => ['import excel files'],
       'file' => 'excel_import.pages.inc',
       'file path' => drupal_get_path('module', 'excel_import') . '/includes',
@@ -62,7 +62,7 @@ function excel_import_menu() {
   ];
 
   $items['admin/content/import/%import_file/import'] = [
-    'title' => 'Review sheet',
+    'title' => 'Import sheet',
     'page callback' => 'excel_import__import_page',
     'page arguments' => [3],
     'access arguments' => ['import excel files'],
@@ -134,7 +134,11 @@ function excel_import_form_alter(&$form, &$form_state, $form_id) {
     excel_import_alter_mapping_add_form($form, $form_state, $form_id);
   }
 
-  // @TODO: Add alter for mapping edit form.
+  // Alter mapping entity edit forms.
+  if ($form_id === 'eck__entity__form_edit_' . MappingEntity::ENTITY_TYPE . '_' . MappingEntity::BUNDLE) {
+    module_load_include('inc', 'excel_import', 'includes/excel_import.form_alter');
+    excel_import_alter_mapping_add_form($form, $form_state, $form_id);
+  }
 
 }
 
@@ -193,4 +197,22 @@ function excel_import_ctools_plugin_directory($owner, $plugin_type) {
  */
 function excel_import_machine_name($string) {
   return strtolower(preg_replace('/[^a-zA-Z0-9-]+/', '-', $string));
+}
+
+/**
+ * Load the mapping for an import type.
+ * @param $import_type
+ * @return mixed
+ */
+function excel_import_load_mapping($import_type) {
+  $query = new EntityFieldQuery();
+  $result = $query->entityCondition('entity_type', MappingEntity::ENTITY_TYPE)
+    ->entityCondition('bundle', MappingEntity::BUNDLE)
+    ->fieldCondition('field_import_type', 'target_id', $import_type->id)
+    ->execute();
+
+  if (!empty($result)) {
+    $mapping_data = reset($result[MappingEntity::ENTITY_TYPE]);
+    return entity_load_single(MappingEntity::ENTITY_TYPE, $mapping_data->id);
+  }
 }
