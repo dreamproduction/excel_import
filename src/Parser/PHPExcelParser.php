@@ -39,8 +39,8 @@ class PHPExcelParser implements ParserInterface {
     // Set the active sheet
     $objPHPExcel->setActiveSheetIndex(0);
     // Get worksheet dimensions
-    $highest_row = $objPHPExcel->getActiveSheet()->getHighestRow();
-    $highest_column = $objPHPExcel->getActiveSheet()->getHighestColumn();
+    $highest_row = $objPHPExcel->getActiveSheet()->getHighestDataRow();
+    $highest_column = $objPHPExcel->getActiveSheet()->getHighestDataColumn();
 
     // Get the header
     $row_data = $objPHPExcel->getActiveSheet()->rangeToArray('A1:' . $highest_column . '1', NULL, TRUE, FALSE);
