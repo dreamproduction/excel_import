@@ -49,6 +49,17 @@ function excel_import_menu() {
       'file path' => drupal_get_path('module', 'excel_import') . '/includes',
       'type' => MENU_LOCAL_ACTION,
     ];
+
+    $items['admin/content/import/' . $type_url_str . '/edit'] = [
+      'title' => 'Edit import type',
+      'title callback' => 'check_plain',
+      'page callback' => 'excel_import__import_type_edit',
+      'page arguments' => [$import_type, 'admin/content/import/' . $type_url_str],
+      'access arguments' => ['import excel files'],
+      'file' => 'excel_import.pages.inc',
+      'file path' => drupal_get_path('module', 'excel_import') . '/includes',
+      'type' => MENU_LOCAL_ACTION,
+    ];
   }
 
   $items['admin/content/import/%import_file/review'] = [
@@ -124,6 +135,12 @@ function excel_import_form_alter(&$form, &$form_state, $form_id) {
 
   // Alter import type entity add forms.
   if ($form_id === 'eck__entity__form_add_' . ImportTypeEntity::ENTITY_TYPE . '_' . ImportTypeEntity::BUNDLE) {
+    module_load_include('inc', 'excel_import', 'includes/excel_import.form_alter');
+    excel_import_alter_import_type_add_form($form, $form_state, $form_id);
+  }
+  
+  // Alter import type entity edit forms.
+  if ($form_id === 'eck__entity__form_edit_' . ImportTypeEntity::ENTITY_TYPE . '_' . ImportTypeEntity::BUNDLE) {
     module_load_include('inc', 'excel_import', 'includes/excel_import.form_alter');
     excel_import_alter_import_type_add_form($form, $form_state, $form_id);
   }

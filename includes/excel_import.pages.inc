@@ -165,3 +165,8 @@ function excel_import__mapping_page($import_type, $destination) {
 
   return $return;
 }
+
+function excel_import__import_type_edit($import_type, $destination) {
+  $_GET['destination'] = $destination;
+  return drupal_get_form('eck__entity__form_edit_' . ImportTypeEntity::ENTITY_TYPE . '_' . ImportTypeEntity::BUNDLE, $import_type);
+}
