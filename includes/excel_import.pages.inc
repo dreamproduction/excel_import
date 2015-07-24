@@ -96,9 +96,8 @@ function excel_import__import_page($import_file) {
   $mapping_data = $mapping_wrapper->field_mapping->value();
 
   $destination_data = $wrapper->field_import_type->field_destination_bundle->value();
-  // @TODO: rename to field_import_processor.
   // @TODO: Make import processors into plugins.
-  $import_processor = $wrapper->field_import_type->field_import_existing->value();
+  $import_processor = $wrapper->field_import_type->field_import_processor->value();
 
   // Get the file uri.
   $file_data = $wrapper->field_import_file->value();

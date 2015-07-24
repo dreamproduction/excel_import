@@ -66,10 +66,10 @@ class ImportTypeEntity extends BaseEntity{
           ],
         ]
       ],
-      'field_import_existing' => [
+      'field_import_processor' => [
         'type' => 'list_text',
         'field' => [
-          'field_name' => 'field_import_existing',
+          'field_name' => 'field_import_processor',
           'settings' => [
             'allowed_values' => [
               'Drupal\excel_import\Importer\SkipExisting' => 'Skip (do not import)',
