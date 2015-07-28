@@ -193,12 +193,29 @@ function excel_import_views_api() {
 }
 
 /**
+ * Implements hook_ctools_plugin_type().
+ */
+function excel_import_ctools_plugin_type() {
+  $return = [];
+
+  $return['import_processor'] = [
+    'cache' => TRUE,
+    'cache table' => 'cache',
+    'use hooks' => FALSE,
+    'classes' => ['class'],
+  ];
+
+  return $return;
+}
+
+/**
  * Implements hook_ctools_plugin_directory().
  */
 function excel_import_ctools_plugin_directory($owner, $plugin_type) {
   switch ("$owner:$plugin_type") {
     case 'mapping_field:mapping_source':
     case 'mapping_field:mapping_destination':
+    case 'excel_import:import_processor':
       return "plugins/$owner/$plugin_type";
   }
 
@@ -232,4 +249,24 @@ function excel_import_load_mapping($import_type) {
     $mapping_data = reset($result[MappingEntity::ENTITY_TYPE]);
     return entity_load_single(MappingEntity::ENTITY_TYPE, $mapping_data->id);
   }
+}
+
+/**
+ * Get all mapping_destination plugins.
+ *
+ * @return mixed
+ */
+function excel_import_get_plugins($type) {
+  ctools_include('plugins');
+  return ctools_get_plugins('excel_import', $type);
+}
+
+/**
+ * Get a mapping_destination plugin.
+ *
+ * @return mixed
+ */
+function excel_import_get_plugin($type, $plugin_name) {
+  ctools_include('plugins');
+  return ctools_get_plugins('excel_import', $type, $plugin_name);
 }

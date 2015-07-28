@@ -16,8 +16,9 @@ function excel_import_do_import($context, &$batch_context) {
 
   $rows = $parser->getRows($context['offset'], $context['limit']);
   foreach ($rows as $row) {
-    $importer = new $context['import_processor']($row, $context['mapping'], $context['entity_type'], $context['bundle']);
-    $importer->processEntity();
+    $plugin = excel_import_get_plugin('import_processor', $context['import_processor']);
+    $processor = new $plugin['class']($row, $context['mapping'], $context['entity_type'], $context['bundle']);
+    $processor->processEntity();
   }
 }
 function excel_import_do_import_finish($success, $results, $operations) {
