@@ -65,7 +65,27 @@ class MappingEntity extends BaseEntity {
           ],
         ],
       ],
-      // @TODO: add field_mapping definition.
+      'field_mapping' => [
+        'type' => 'mapping_field',
+        'field' => [
+          'field_name' => 'field_mapping',
+          'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+        ],
+        'instance' => [
+          'label' => 'Mapping',
+          'required' => TRUE,
+          'widget' => [
+            'type' => 'mapping_field_selector',
+          ],
+          'display' => [
+            'default' => [
+              'label' => 'hidden',
+              'type' => 'hidden',
+              'weight' => 1,
+            ],
+          ],
+        ],
+      ],
     ];
   }
 }

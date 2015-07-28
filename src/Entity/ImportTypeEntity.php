@@ -66,16 +66,16 @@ class ImportTypeEntity extends BaseEntity{
           ],
         ]
       ],
-      'field_import_existing' => [
+      'field_import_processor' => [
         'type' => 'list_text',
         'field' => [
-          'field_name' => 'field_import_existing',
+          'field_name' => 'field_import_processor',
           'settings' => [
             'allowed_values' => [
-              'Drupal\excel_import\Importer\SkipExisting' => 'Skip (do not import)',
-              'Drupal\excel_import\Importer\ReplaceExisting' => 'Replace (delete and create from scratch)',
-              'Drupal\excel_import\Importer\UpdateExisting' => 'Update (overwrite just the values present in the import)',
-              'Drupal\excel_import\Importer\DuplicateExisting' => 'Duplicate (just create a new entity for each row, without checking for existing entities)',
+              'skip_existing' => 'Skip (do not import)',
+              'replace_existing' => 'Replace (delete and create from scratch)',
+              'update_existing' => 'Update (overwrite just the values present in the import)',
+              'duplicate_existing' => 'Duplicate (just create a new entity for each row, without checking for existing entities)',
             ],
           ],
         ],

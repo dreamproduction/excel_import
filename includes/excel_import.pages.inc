@@ -96,9 +96,8 @@ function excel_import__import_page($import_file) {
   $mapping_data = $mapping_wrapper->field_mapping->value();
 
   $destination_data = $wrapper->field_import_type->field_destination_bundle->value();
-  // @TODO: rename to field_import_processor.
   // @TODO: Make import processors into plugins.
-  $import_processor = $wrapper->field_import_type->field_import_existing->value();
+  $import_processor = $wrapper->field_import_type->field_import_processor->value();
 
   // Get the file uri.
   $file_data = $wrapper->field_import_file->value();
@@ -165,4 +164,9 @@ function excel_import__mapping_page($import_type, $destination) {
   }
 
   return $return;
+}
+
+function excel_import__import_type_edit($import_type, $destination) {
+  $_GET['destination'] = $destination;
+  return drupal_get_form('eck__entity__form_edit_' . ImportTypeEntity::ENTITY_TYPE . '_' . ImportTypeEntity::BUNDLE, $import_type);
 }
