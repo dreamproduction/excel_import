@@ -24,7 +24,7 @@ function excel_import_alter_import_file_add_form(&$form, &$form_state, $form_id)
 
   // Set the status as not imported, and hide it from the form.
   unset($form['field_import_status']);
-  $wrapper->field_import_status->set('imported');
+  $wrapper->field_import_status->set('not_imported');
 
   $form['title']['#access'] = FALSE;
 
