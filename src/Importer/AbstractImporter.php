@@ -91,7 +91,11 @@ abstract class AbstractImporter {
     }
 
     if ($updated) {
-      $wrapper->save();
+      try {
+        $wrapper->save();
+      } catch (\Exception $e) {
+        drupal_set_message(t('Can\'t save entity with values: !values. Original mesage: !message.', ['!values' => var_export($wrapper->value(), TRUE), '!message' => $e->getMessage()]), 'warning');
+      }
     }
   }
 
