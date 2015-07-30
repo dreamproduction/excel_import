@@ -27,6 +27,6 @@ class HeaderPrefixSuffix extends Header {
   }
 
   function getValue($row, $data) {
-    return $data['preffix'] . parent::getValue($row, $data['column']) . $data['suffix'];
+    return $data['prefix'] . parent::getValue($row, $data['column']) . $data['suffix'];
   }
 }
