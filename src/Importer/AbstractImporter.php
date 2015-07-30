@@ -77,8 +77,12 @@ abstract class AbstractImporter {
       $previous_value = $destination_plugin_instance->getValue($wrapper, $destination_data);
 
       if ($value != $previous_value) {
-        $destination_plugin_instance->setValue($wrapper, $value, $destination_data);
-        $updated = TRUE;
+        try {
+          $destination_plugin_instance->setValue($wrapper, $value, $destination_data);
+          $updated = TRUE;
+        } catch (\EntityMetadataWrapperException $e) {
+          drupal_set_message(t('Wrong value passed: !value for destination !data', ['!value' => var_export($value, TRUE), '!data' => var_export($destination_data, TRUE)]), 'warning');
+        }
       }
     }
 
