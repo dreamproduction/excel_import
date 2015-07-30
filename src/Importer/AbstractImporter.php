@@ -74,14 +74,18 @@ abstract class AbstractImporter {
       $destination_plugin = mapping_field_get_plugin('mapping_destination', $destination_plugin_name);
       $destination_plugin_instance = new $destination_plugin['class']($this->getEntityType(), $this->getBundle());
       $destination_data = $mapping['destination_data'][$destination_plugin_name];
-      $previous_value = $destination_plugin_instance->getValue($wrapper, $destination_data);
+      try {
+        $previous_value = $destination_plugin_instance->getValue($wrapper, $destination_data);
+      } catch (\EntityMetadataWrapperException $e) {
+        drupal_set_message(t('Can\'t read the previous value for destination: !data', ['!data' => var_export($destination_data, TRUE)]));
+      }
 
       if ($value != $previous_value) {
         try {
           $destination_plugin_instance->setValue($wrapper, $value, $destination_data);
           $updated = TRUE;
         } catch (\EntityMetadataWrapperException $e) {
-          drupal_set_message(t('Wrong value passed: !value for destination !data', ['!value' => var_export($value, TRUE), '!data' => var_export($destination_data, TRUE)]), 'warning');
+          drupal_set_message(t('Wrong value passed: !value for destination: !data', ['!value' => var_export($value, TRUE), '!data' => var_export($destination_data, TRUE)]), 'warning');
         }
       }
     }
