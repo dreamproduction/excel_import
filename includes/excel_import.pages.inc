@@ -115,7 +115,7 @@ function excel_import__import_page($import_file) {
     'file' => drupal_get_path('module', 'excel_import') . '/includes/excel_import.import.inc',
   ];
 
-  $offset = 1;
+  $offset = 0;
   $limit = 20;
   while($offset < $count) {
     $context = [
