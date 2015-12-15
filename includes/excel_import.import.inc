@@ -26,6 +26,7 @@ function excel_import_do_import_finish($success, $results, $operations) {
     $import_file = $results['import_file'];
     $wrapper = entity_metadata_wrapper(\Drupal\excel_import\Entity\ImportFileEntity::ENTITY_TYPE, $import_file);
     $wrapper->field_import_status->set('imported');
+    $wrapper->field_import_date->set(strtotime('NOW'));
     $wrapper->save();
   }
 }

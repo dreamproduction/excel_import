@@ -111,6 +111,36 @@ class ImportFileEntity extends BaseEntity {
           'default_value' => [['value' => 'not_imported']],
         ],
       ],
+      'field_import_date' => [
+        'type' => 'datestamp',
+        'field' => [
+          'field_name' => 'field_import_date',
+          'settings' => [
+            'todate' => '',
+            'granularity' => [
+              'day' => 'day',
+              'month' => 'month',
+              'year' => 'year',
+              'hour' => 'hour',
+              'minute' => 'minute',
+              'second' => 'second',
+            ],
+            'tz_handling' => 'site',
+            'timezone_db' => 'UTC',
+          ],
+        ],
+        'instance' => [
+          'label' => 'Import date',
+          'required' => TRUE,
+          'widget' => [
+            'type' => 'date_popup',
+            'settings' => [
+              'input_format' => 'Y-m-d H:i:s',
+              'default_value' => 'now',
+            ],
+          ],
+        ],
+      ],
     ];
   }
 
