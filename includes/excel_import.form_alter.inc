@@ -40,6 +40,20 @@ function excel_import_alter_import_file_add_form(&$form, &$form_state, $form_id)
     unset($form['field_import_type']);
     $wrapper->field_import_type->set($import_type->id);
   }
+
+  // Show/hide the import source based on its type.
+  if (isset($form['field_import_source'])){
+    $form['field_import_file']['#states'] = array(
+      'visible' => array(
+        ':input[name="field_import_source[und]"]' => array('value' => 'file'),
+      ),
+    );
+    $form['field_import_url']['#states'] = array(
+      'visible' => array(
+        ':input[name="field_import_source[und]"]' => array('value' => 'url'),
+      ),
+    );
+  }
 }
 
 /**

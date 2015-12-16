@@ -9,20 +9,6 @@ use Drupal\excel_import\Entity\ImportTypeEntity;
 use Drupal\excel_import\Entity\MappingEntity;
 
 /**
- * Implements hook_enable().
- */
-function excel_import_enable() {
-  $entity = new ImportTypeEntity();
-  $entity->ensureEntityTypeCreated();
-
-  $entity = new ImportFileEntity();
-  $entity->ensureEntityTypeCreated();
-
-  $entity = new MappingEntity();
-  $entity->ensureEntityTypeCreated();
-}
-
-/**
  * Implements hook_uninstall().
  */
 function excel_import_uninstall() {
@@ -42,4 +28,80 @@ function excel_import_uninstall() {
   $entity = new MappingEntity();
   $entity->ensureEntityTypeDeleted();
 
+}
+
+/**
+ * Adds the URL and import source fields to Import File Entity.
+ * Change entity labels.
+ */
+function excel_import_update_7001() {
+  $entity_type = EntityType::loadByName(ImportFileEntity::ENTITY_TYPE);
+  // Change entity label.
+  $entity_type->label = 'Import source';
+  $entity_type->save();
+
+  // Change bundle label.
+  $bundle = bundle_load(ImportFileEntity::ENTITY_TYPE, ImportFileEntity::BUNDLE);
+  $bundle = Bundle::loadByMachineName(ImportFileEntity::ENTITY_TYPE . '_' . ImportFileEntity::BUNDLE);
+  $bundle->label = 'Import source';
+  $bundle->save();
+
+  // Add field_import_source.
+  $instance = field_info_instance(ImportFileEntity::ENTITY_TYPE, 'field_import_source' ,ImportFileEntity::BUNDLE);
+  $field_definition = [
+    'type' => 'list_text',
+    'field' => [
+      'field_name' => 'field_import_source',
+      'settings' => [
+        'allowed_values' => [
+          IMPORT_SOURCE_FILE => 'Import from File',
+          IMPORT_SOURCE_URL => 'Import from URL',
+        ],
+      ],
+    ],
+    'instance' => [
+      'label' => 'Import source',
+      'required' => TRUE,
+      'widget' => [
+        'type' => ' options_buttons',
+      ],
+      'default_value' => [['value' => 'file']],
+    ],
+  ];
+  if (!$instance) {
+    $bundle->addField($field_definition['type'], [
+      'field' => $field_definition['field'],
+      'instance' => $field_definition['instance'],
+    ]);
+  }
+
+  // Add field_import_url.
+  $instance = field_info_instance(ImportFileEntity::ENTITY_TYPE, 'field_import_url' ,ImportFileEntity::BUNDLE);
+  $field_definition = [
+    'type' => 'link_field',
+    'field' => [
+      'field_name' => 'field_import_url',
+      'settings' => [
+        'attributes' => [
+          'target' => 'default',
+        ],
+      ],
+    ],
+    'instance' => [
+      'label' => 'Import URL',
+      'required' => FALSE,
+      'widget' => [
+        'type' => ' link_field',
+      ],
+      'settings' => [
+        'title' => 'none',
+      ]
+    ],
+  ];
+  if (!$instance) {
+    $bundle->addField($field_definition['type'], [
+      'field' => $field_definition['field'],
+      'instance' => $field_definition['instance'],
+    ]);
+  }
 }

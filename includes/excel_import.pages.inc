@@ -10,7 +10,7 @@ use Drupal\excel_import\Entity\MappingEntity;
 use Drupal\excel_import\Parser\PHPExcelParser;
 
 /**
- * Page callback for the import overview page.
+ * Page callback for a specific import overview page.
  * @param $import_type
  * @return array
  */
@@ -23,7 +23,7 @@ function excel_import__import_overview_page($import_type) {
   $return['add_form'] = [
     '#theme' => 'fieldset',
     '#children' => drupal_render($form),
-    '#title' => t('+ Upload file for import'),
+    '#title' => t('+ Source for import'),
     '#attributes' => [
       'class' => ['import-file-add-fieldset', 'collapsible', 'collapsed'],
     ],
@@ -96,13 +96,23 @@ function excel_import__import_page($import_file) {
   $mapping_data = $mapping_wrapper->field_mapping->value();
 
   $destination_data = $wrapper->field_import_type->field_destination_bundle->value();
-  // @TODO: Make import processors into plugins.
   $import_processor = $wrapper->field_import_type->field_import_processor->value();
 
-  // Get the file uri.
-  $file_data = $wrapper->field_import_file->value();
-  $uri = drupal_realpath($file_data['uri']);
+  // Switch based on the import source.
+  $import_source = isset($wrapper->field_import_source) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
+  switch ($import_source) {
+    case IMPORT_SOURCE_FILE:
+      // Get the file uri.
+      $file_data = $wrapper->field_import_file->value();
+      $uri = drupal_realpath($file_data['uri']);
+      break;
 
+    case IMPORT_SOURCE_URL:
+      $url_info = $wrapper->field_import_url->value();
+      $file_data = file_get_contents($url_info['url']);
+      $uri = file_unmanaged_save_data($file_data);
+      break;
+  }
   // Get the number of records in the file.
   $header_keys = TRUE;
   $parser = new PHPExcelParser($uri, $header_keys);
