@@ -185,7 +185,7 @@ function excel_import_entity_presave($entity, $type) {
 
     $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $entity);
 
-    $import_source = isset($wrapper->field_import_source) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
+    $import_source = (isset($wrapper->field_import_source) && !empty($wrapper->field_import_source->value())) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
     switch ($import_source) {
       case IMPORT_SOURCE_FILE:
         $file_value = $wrapper->field_import_file->value();

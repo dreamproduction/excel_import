@@ -99,7 +99,7 @@ function excel_import__import_page($import_file) {
   $import_processor = $wrapper->field_import_type->field_import_processor->value();
 
   // Switch based on the import source.
-  $import_source = isset($wrapper->field_import_source) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
+  $import_source = (isset($wrapper->field_import_source) && !empty($wrapper->field_import_source->value())) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
   switch ($import_source) {
     case IMPORT_SOURCE_FILE:
       // Get the file uri.
