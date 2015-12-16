@@ -300,3 +300,28 @@ function excel_import_get_plugin($type, $plugin_name) {
   ctools_include('plugins');
   return ctools_get_plugins('excel_import', $type, $plugin_name);
 }
+
+/**
+ * Get URI for the import file based on the source (File/URL).
+ * @param  $import_file
+ * @return string URI
+ */
+function excel_import_get_uri($import_file){
+  $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $import_file);
+  // Switch based on the import source.
+  $import_source = (isset($wrapper->field_import_source) && !empty($wrapper->field_import_source->value())) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
+  switch ($import_source) {
+    case IMPORT_SOURCE_FILE:
+      // Get the file uri.
+      $file_data = $wrapper->field_import_file->value();
+      $uri = drupal_realpath($file_data['uri']);
+      break;
+
+    case IMPORT_SOURCE_URL:
+      $url_info = $wrapper->field_import_url->value();
+      $file_data = file_get_contents($url_info['url']);
+      $uri = file_unmanaged_save_data($file_data, 'temporary://');
+      break;
+  }
+  return $uri;
+}

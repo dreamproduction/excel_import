@@ -50,9 +50,7 @@ function excel_import__review_page($import_file) {
     '#markup' => l(t('Back to overview'), 'admin/content/import'),
   ];
 
-  $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $import_file);
-  $file_data = $wrapper->field_import_file->value();
-  $uri = drupal_realpath($file_data['uri']);
+  $uri = excel_import_get_uri($import_file);
 
   $header_keys = TRUE;
   $parser = new PHPExcelParser($uri, $header_keys);
@@ -104,21 +102,7 @@ function excel_import__import_page($import_file) {
   $destination_data = $wrapper->field_import_type->field_destination_bundle->value();
   $import_processor = $wrapper->field_import_type->field_import_processor->value();
 
-  // Switch based on the import source.
-  $import_source = (isset($wrapper->field_import_source) && !empty($wrapper->field_import_source->value())) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
-  switch ($import_source) {
-    case IMPORT_SOURCE_FILE:
-      // Get the file uri.
-      $file_data = $wrapper->field_import_file->value();
-      $uri = drupal_realpath($file_data['uri']);
-      break;
-
-    case IMPORT_SOURCE_URL:
-      $url_info = $wrapper->field_import_url->value();
-      $file_data = file_get_contents($url_info['url']);
-      $uri = file_unmanaged_save_data($file_data);
-      break;
-  }
+  $uri = excel_import_get_uri($import_file);
   // Get the number of records in the file.
   $header_keys = TRUE;
   $parser = new PHPExcelParser($uri, $header_keys);
