@@ -28,7 +28,7 @@ function excel_import_alter_import_file_add_form(&$form, &$form_state, $form_id)
 
   // Set the date as empty date and hide it from the form.
   unset($form['field_import_date']);
-  $wrapper->field_import_date->set(0);
+  $wrapper->field_import_date->set(NULL);
 
   $form['title']['#access'] = FALSE;
 
