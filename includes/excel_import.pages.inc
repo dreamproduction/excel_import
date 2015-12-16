@@ -92,6 +92,12 @@ function excel_import__import_page($import_file) {
   $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $import_file);
   $import_type = $wrapper->field_import_type->value();
   $mapping_entity = excel_import_load_mapping($import_type);
+  // Redirect to mapping definition is there is none defined.
+  if (empty($mapping_entity)){
+    drupal_set_message(t('A mapping should be defined, before import run.'), 'error');
+    $type_url_str = excel_import_machine_name($import_type->title);
+    drupal_goto('admin/content/import/' . $type_url_str . '/mapping');
+  }
   $mapping_wrapper = entity_metadata_wrapper(MappingEntity::ENTITY_TYPE, $mapping_entity);
   $mapping_data = $mapping_wrapper->field_mapping->value();
 
