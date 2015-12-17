@@ -19,7 +19,7 @@ class Header extends BaseSource {
    * Header constructor.
    * @param $uri
    */
-  public function __construct($uri) {
+  public function __construct($uri = NULL) {
     $this->setUri($uri);
   }
 
