@@ -74,7 +74,7 @@ class Header extends BaseSource {
     $this->header = $header;
   }
 
-  function getValue($row, $key) {
+  function getValue($row, $key, $import_file) {
     return $row[$key];
   }
 }

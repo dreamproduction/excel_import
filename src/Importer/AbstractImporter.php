@@ -22,6 +22,12 @@ abstract class AbstractImporter {
   protected $entity;
 
   /**
+   * @var object
+   */
+  protected $import_file;
+
+
+  /**
    * @var array
    */
   protected $row;
@@ -48,11 +54,12 @@ abstract class AbstractImporter {
    * @param $entity_type
    * @param $bundle
    */
-  public function __construct($row, $mapping, $entity_type, $bundle) {
+  public function __construct($row, $mapping, $entity_type, $bundle, $import_file) {
     $this->setRow($row);
     $this->setMapping($mapping);
     $this->setEntityType($entity_type);
     $this->setBundle($bundle);
+    $this->setImportFile($import_file);
   }
 
   abstract protected function loadEntity();
@@ -68,7 +75,7 @@ abstract class AbstractImporter {
       $source_plugin = mapping_field_get_plugin('mapping_source', $source_plugin_name);
       $source_plugin_instance = new $source_plugin['class']();
       $source_data = $mapping['source_data'][$source_plugin_name];
-      $value = $source_plugin_instance->getValue($this->getRow(), $source_data);
+      $value = $source_plugin_instance->getValue($this->getRow(), $source_data, $this->getImportFile());
 
       $destination_plugin_name = $mapping['destination_plugin'];
       $destination_plugin = mapping_field_get_plugin('mapping_destination', $destination_plugin_name);
@@ -129,7 +136,7 @@ abstract class AbstractImporter {
         $source_plugin = mapping_field_get_plugin('mapping_source', $source_plugin_name);
         $source_plugin_instance = new $source_plugin['class']();
         $source_data = $mapping['source_data'][$source_plugin_name];
-        $value = $source_plugin_instance->getValue($this->getRow(), $source_data);
+        $value = $source_plugin_instance->getValue($this->getRow(), $source_data, $this->getImportFile());
         $destination_plugin_instance->addCondition($this->getEfq(), $destination_data, $value);
         $condition_added = TRUE;
       }
@@ -238,4 +245,17 @@ abstract class AbstractImporter {
     $this->efq = $efq;
   }
 
+  /**
+   * @return mixed
+   */
+  protected function getImportFile() {
+    return $this->import_file;
+  }
+
+  /**
+   * @param mixed $import_file
+   */
+  protected function setImportFile($import_file) {
+    $this->import_file = $import_file;
+  }
 }
