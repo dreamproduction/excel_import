@@ -25,7 +25,7 @@ function excel_import_drush_command() {
 /**
  * Runs all the imports for a specific import_type.
  */
-function drush_excel_import_type($import_type_id) {
+function drush_excel_import_type($import_type_id = NULL) {
   // Set error for import type if is not set to drush command.
   if(!isset($import_type_id) || empty($import_type_id)){    
     return drush_set_error('error', dt('The import type id is missing.'));
