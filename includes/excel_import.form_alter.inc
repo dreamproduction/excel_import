@@ -37,7 +37,7 @@ function excel_import_alter_import_file_add_form(&$form, &$form_state, $form_id)
   if (isset($args[1]) && is_array($args[1]) && isset($args[1]['import_type'])) {
 
     // Hide the import type field, and set it to the provided import type.
-    unset($form['field_import_type']);
+    $form['field_import_type']['#access'] = FALSE;
     $wrapper->field_import_type->set($import_type->id);
   }
 
