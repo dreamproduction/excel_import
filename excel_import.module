@@ -321,6 +321,15 @@ function excel_import_get_uri($import_file){
       $url_info = $wrapper->field_import_url->value();
       $file_data = file_get_contents($url_info['url']);
       $uri = file_unmanaged_save_data($file_data, 'temporary://');
+      // Create a file object.
+      $file = new stdClass();
+      $file->fid = NULL;
+      $file->uri = $uri;
+      $file->filename = drupal_basename($uri);
+      $file->filemime = file_get_mimetype($file->uri);
+      $file->uid      = 1;
+      $file->status   = 0;
+      file_save($file);
       break;
   }
   return $uri;

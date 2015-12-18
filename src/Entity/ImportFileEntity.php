@@ -172,12 +172,11 @@ class ImportFileEntity extends BaseEntity {
         ],
         'instance' => [
           'label' => 'Import date',
-          'required' => TRUE,
           'widget' => [
             'type' => 'date_popup',
             'settings' => [
               'input_format' => 'Y-m-d H:i:s',
-              'default_value' => 'now',
+              'default_value' => 'blank',
             ],
           ],
         ],
