@@ -121,6 +121,6 @@ abstract class BaseEntity {
   }
 
   static public function getAllEntities() {
-    return entity_load(static::ENTITY_TYPE);
+    return entity_load(static::ENTITY_TYPE, $ids = FALSE, $conditions = array(), $reset = TRUE);
   }
 }
