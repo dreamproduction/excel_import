@@ -67,7 +67,7 @@ function drush_excel_import_type($import_type_id = NULL) {
     $count = $parser->getCount();
 
     $offset = 0;
-    $limit = 20;
+    $limit = 100000;
     while($offset < $count) {
       $context = [
         'uri' => $uri,
