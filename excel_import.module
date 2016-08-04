@@ -234,6 +234,12 @@ function excel_import_ctools_plugin_type() {
     'use hooks' => FALSE,
     'classes' => ['class'],
   ];
+  $return['cleaner_processor'] = [
+    'cache' => TRUE,
+    'cache table' => 'cache',
+    'use hooks' => FALSE,
+    'classes' => ['class'],
+  ];
 
   return $return;
 }
@@ -246,6 +252,7 @@ function excel_import_ctools_plugin_directory($owner, $plugin_type) {
     case 'mapping_field:mapping_source':
     case 'mapping_field:mapping_destination':
     case 'excel_import:import_processor':
+    case 'excel_import:cleaner_processor':
       return "plugins/$owner/$plugin_type";
   }
 
