@@ -118,28 +118,48 @@ function drush_excel_import_clean($import_type_id = NULL) {
     $import_status = $wrapper->field_import_status->value();
     // Ensure the entity was successfully imported before cleaning.
     if($import_status == 'imported') {
-      $import_type = $wrapper->field_import_type->value();
-      $mapping_entity = excel_import_load_mapping($import_type);
-      // Set error for mapping definition if there is none defined.
-      if (empty($mapping_entity)) {
-        return drush_set_error('error', dt('A mapping should be defined for the import type id @import_type_id, before import run.', array('@import_type_id' => $import_type_id)));
+      $import_source = $wrapper->field_import_source->value();
+      // Ensure the imported file exists.
+      $exists = false;
+      if ($import_source == 'url') {
+        $import_file_entity = $wrapper->field_import_url->value();
+        $import_file_url = $import_file_entity['url'];
+        $file_headers = @get_headers($import_file_url);
+        if($file_headers && $file_headers[0] != 'HTTP/1.1 404 Not Found') {
+          $exists = true;
+        }
       }
-      $mapping_wrapper = entity_metadata_wrapper(MappingEntity::ENTITY_TYPE, $mapping_entity);
-      $mapping_data = $mapping_wrapper->field_mapping->value();
+      else {
+        $import_file_entity = $wrapper->field_import_file->value();
+        if (isset($import_file_entity['uri']) && file_exists($import_file_entity['uri'])) {
+          $exists = true;
+        }
+      }
 
-      $destination_data = $wrapper->field_import_type->field_destination_bundle->value();
+      if ($exists) {
+        $import_type = $wrapper->field_import_type->value();
+        $mapping_entity = excel_import_load_mapping($import_type);
+        // Set error for mapping definition if there is none defined.
+        if (empty($mapping_entity)) {
+          return drush_set_error('error', dt('A mapping should be defined for the import type id @import_type_id, before import run.', array('@import_type_id' => $import_type_id)));
+        }
+        $mapping_wrapper = entity_metadata_wrapper(MappingEntity::ENTITY_TYPE, $mapping_entity);
+        $mapping_data = $mapping_wrapper->field_mapping->value();
 
-      $uri = excel_import_get_uri($import_file);
+        $destination_data = $wrapper->field_import_type->field_destination_bundle->value();
 
-      $context = [
-        'uri' => $uri,
-        'entity_type' => $destination_data['entity_type'],
-        'bundle' => $destination_data['bundle'],
-        'mapping' => $mapping_data,
-        'import_file' => $import_file,
-      ];
+        $uri = excel_import_get_uri($import_file);
 
-      excel_import_do_clean($context);
+        $context = [
+          'uri' => $uri,
+          'entity_type' => $destination_data['entity_type'],
+          'bundle' => $destination_data['bundle'],
+          'mapping' => $mapping_data,
+          'import_file' => $import_file,
+        ];
+
+        excel_import_do_clean($context);
+      }
     }
   }
 }
