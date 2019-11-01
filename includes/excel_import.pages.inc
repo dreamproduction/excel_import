@@ -142,25 +142,33 @@ function excel_import__mapping_page($import_type, $destination) {
   $_GET['destination'] = $destination;
   $return = [];
 
-  $wrapper = entity_metadata_wrapper(ImportTypeEntity::ENTITY_TYPE, $import_type);
-  $file_data = $wrapper->field_header_sample->value();
-  $entity_type_bundle = $wrapper->field_destination_bundle->value() ;
+  if (isset($import_type->id) && $import_type->id) {
+    // Load the import type entity again because sometimes there are fields
+    // (like file fields) that don't get loaded.
+    $import_type = entity_load_single(ImportTypeEntity::ENTITY_TYPE, $import_type->id);
+    $wrapper = entity_metadata_wrapper(ImportTypeEntity::ENTITY_TYPE, $import_type);
+    $file_data = $wrapper->field_header_sample->value();
 
-  $context = [
-    'import_type' => $import_type,
-    'header_file_uri' => drupal_realpath($file_data['uri']),
-    'destination' => [
-      'entity_type' => $entity_type_bundle['entity_type'],
-      'bundle' => $entity_type_bundle['bundle'],
-    ]
-  ];
+    if ($file_data) {
+      $entity_type_bundle = $wrapper->field_destination_bundle->value();
 
-  if ($entity = excel_import_load_mapping($import_type)) {
-    $return['edit_form'] = drupal_get_form('eck__entity__form_edit_' . MappingEntity::ENTITY_TYPE . '_' . MappingEntity::BUNDLE, $entity, $context);
-  }
-  else {
-    $entity = entity_create(MappingEntity::ENTITY_TYPE, ['type' => MappingEntity::BUNDLE]);
-    $return['add_form'] = drupal_get_form('eck__entity__form_add_' . MappingEntity::ENTITY_TYPE . '_' . MappingEntity::BUNDLE, $entity, $context);
+      $context = [
+        'import_type' => $import_type,
+        'header_file_uri' => drupal_realpath($file_data['uri']),
+        'destination' => [
+          'entity_type' => $entity_type_bundle['entity_type'],
+          'bundle' => $entity_type_bundle['bundle'],
+        ]
+      ];
+
+      if ($entity = excel_import_load_mapping($import_type)) {
+        $return['edit_form'] = drupal_get_form('eck__entity__form_edit_' . MappingEntity::ENTITY_TYPE . '_' . MappingEntity::BUNDLE, $entity, $context);
+      }
+      else {
+        $entity = entity_create(MappingEntity::ENTITY_TYPE, ['type' => MappingEntity::BUNDLE]);
+        $return['add_form'] = drupal_get_form('eck__entity__form_add_' . MappingEntity::ENTITY_TYPE . '_' . MappingEntity::BUNDLE, $entity, $context);
+      }
+    }
   }
 
   return $return;
