@@ -74,7 +74,7 @@ class Header extends BaseSource {
     $this->header = $header;
   }
 
-  function getValue($row, $key) {
+  public static function getValue($row, $key) {
     return $row[$key];
   }
 }

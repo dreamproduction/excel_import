@@ -66,14 +66,13 @@ abstract class AbstractImporter {
     foreach ($this->getMapping() as $mapping) {
       $source_plugin_name = $mapping['source_plugin'];
       $source_plugin = mapping_field_get_plugin('mapping_source', $source_plugin_name);
-      $source_plugin_instance = new $source_plugin['class']();
       $source_data = $mapping['source_data'][$source_plugin_name];
-      $value = $source_plugin_instance->getValue($this->getRow(), $source_data);
 
+      $value = $source_plugin['class']::getValue($this->getRow(), $source_data);
       $destination_plugin_name = $mapping['destination_plugin'];
       $destination_plugin = mapping_field_get_plugin('mapping_destination', $destination_plugin_name);
       $destination_plugin_instance = new $destination_plugin['class']($this->getEntityType(), $this->getBundle());
-      $destination_data = $mapping['destination_data'][$destination_plugin_name];
+      $destination_data = isset($mapping['destination_data'][$destination_plugin_name]) ? $mapping['destination_data'][$destination_plugin_name] : [];
       try {
         $previous_value = $destination_plugin_instance->getValue($wrapper, $destination_data);
       } catch (\EntityMetadataWrapperException $e) {
@@ -122,14 +121,13 @@ abstract class AbstractImporter {
       $destination_plugin_name = $mapping['destination_plugin'];
       $destination_plugin = mapping_field_get_plugin('mapping_destination', $destination_plugin_name);
       $destination_plugin_instance = new $destination_plugin['class']($this->getEntityType(), $this->getBundle());
-      $destination_data = $mapping['destination_data'][$destination_plugin_name];
+      $destination_data = isset($mapping['destination_data'][$destination_plugin_name]) ? $mapping['destination_data'][$destination_plugin_name] : [];
 
       if ($destination_plugin_instance->isIdField($destination_data)) {
         $source_plugin_name = $mapping['source_plugin'];
         $source_plugin = mapping_field_get_plugin('mapping_source', $source_plugin_name);
-        $source_plugin_instance = new $source_plugin['class']();
         $source_data = $mapping['source_data'][$source_plugin_name];
-        $value = $source_plugin_instance->getValue($this->getRow(), $source_data);
+        $value =  $source_plugin['class']::getValue($this->getRow(), $source_data);
         $destination_plugin_instance->addCondition($this->getEfq(), $destination_data, $value);
         $condition_added = TRUE;
       }
