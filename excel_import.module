@@ -4,9 +4,27 @@
  * @file
  * Provides import functionality for all entity types, from excel files.
  */
+
+define('IMPORT_SOURCE_FILE', 'file');
+define('IMPORT_SOURCE_URL', 'url');
+
 use Drupal\excel_import\Entity\ImportFileEntity;
 use Drupal\excel_import\Entity\ImportTypeEntity;
 use Drupal\excel_import\Entity\MappingEntity;
+
+/**
+ * Implements hook_enable().
+ */
+function excel_import_enable() {
+  $entity = new ImportTypeEntity();
+  $entity->ensureEntityTypeCreated();
+
+  $entity = new ImportFileEntity();
+  $entity->ensureEntityTypeCreated();
+
+  $entity = new MappingEntity();
+  $entity->ensureEntityTypeCreated();
+}
 
 /**
  * Implements hook_menu().
@@ -20,7 +38,6 @@ function excel_import_menu() {
     'weight' => -8,
     'page callback' => 'system_admin_menu_block_page',
     'access arguments' => ['import excel files'],
-    'type' => MENU_NORMAL_ITEM,
     'file' => 'system.admin.inc',
     'file path' => drupal_get_path('module', 'system'),
   ];
@@ -138,7 +155,7 @@ function excel_import_form_alter(&$form, &$form_state, $form_id) {
     module_load_include('inc', 'excel_import', 'includes/excel_import.form_alter');
     excel_import_alter_import_type_add_form($form, $form_state, $form_id);
   }
-  
+
   // Alter import type entity edit forms.
   if ($form_id === 'eck__entity__form_edit_' . ImportTypeEntity::ENTITY_TYPE . '_' . ImportTypeEntity::BUNDLE) {
     module_load_include('inc', 'excel_import', 'includes/excel_import.form_alter');
@@ -166,18 +183,31 @@ function excel_import_entity_presave($entity, $type) {
   if ($type == ImportFileEntity::ENTITY_TYPE &&
     (!isset($entity->title) || empty($entity->title))) {
 
-    $wraper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $entity);
-    $file_value = $wraper->field_import_file->value();
-    $file = file_load($file_value['fid']);
-    $wraper->title->set($file->filename);
+    $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $entity);
+
+    $import_source = (isset($wrapper->field_import_source) && !empty($wrapper->field_import_source->value())) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
+    switch ($import_source) {
+      case IMPORT_SOURCE_FILE:
+        $file_value = $wrapper->field_import_file->value();
+        $file = file_load($file_value['fid']);
+        $file_name = $file->filename;
+        break;
+
+      case IMPORT_SOURCE_URL:
+        $url_info = $wrapper->field_import_url->value();
+        $path_info = pathinfo($url_info['url']);
+        $file_name = $path_info['filename'];
+        break;
+    }
+    $wrapper->title->set($file_name);
   }
 
   if ($type == MappingEntity::ENTITY_TYPE &&
     (!isset($entity->title) || empty($entity->title))) {
 
-    $wraper = entity_metadata_wrapper(MappingEntity::ENTITY_TYPE, $entity);
-    $import_type_title = $wraper->field_import_type->title->value();
-    $wraper->title->set(format_string('Mapping for @title', ['@title' => $import_type_title]));
+    $wrapper = entity_metadata_wrapper(MappingEntity::ENTITY_TYPE, $entity);
+    $import_type_title = $wrapper->field_import_type->title->value();
+    $wrapper->title->set(format_string('Mapping for @title', ['@title' => $import_type_title]));
   }
 }
 
@@ -204,6 +234,12 @@ function excel_import_ctools_plugin_type() {
     'use hooks' => FALSE,
     'classes' => ['class'],
   ];
+  $return['cleaner_processor'] = [
+    'cache' => TRUE,
+    'cache table' => 'cache',
+    'use hooks' => FALSE,
+    'classes' => ['class'],
+  ];
 
   return $return;
 }
@@ -216,6 +252,7 @@ function excel_import_ctools_plugin_directory($owner, $plugin_type) {
     case 'mapping_field:mapping_source':
     case 'mapping_field:mapping_destination':
     case 'excel_import:import_processor':
+    case 'excel_import:cleaner_processor':
       return "plugins/$owner/$plugin_type";
   }
 
@@ -269,4 +306,38 @@ function excel_import_get_plugins($type) {
 function excel_import_get_plugin($type, $plugin_name) {
   ctools_include('plugins');
   return ctools_get_plugins('excel_import', $type, $plugin_name);
+}
+
+/**
+ * Get URI for the import file based on the source (File/URL).
+ * @param  $import_file
+ * @return string URI
+ */
+function excel_import_get_uri($import_file){
+  $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $import_file);
+  // Switch based on the import source.
+  $import_source = (isset($wrapper->field_import_source) && !empty($wrapper->field_import_source->value())) ? $wrapper->field_import_source->value() : IMPORT_SOURCE_FILE;
+  switch ($import_source) {
+    case IMPORT_SOURCE_FILE:
+      // Get the file uri.
+      $file_data = $wrapper->field_import_file->value();
+      $uri = drupal_realpath($file_data['uri']);
+      break;
+
+    case IMPORT_SOURCE_URL:
+      $url_info = $wrapper->field_import_url->value();
+      $file_data = file_get_contents($url_info['url']);
+      $uri = file_unmanaged_save_data($file_data, 'temporary://');
+      // Create a file object.
+      $file = new stdClass();
+      $file->fid = NULL;
+      $file->uri = $uri;
+      $file->filename = drupal_basename($uri);
+      $file->filemime = file_get_mimetype($file->uri);
+      $file->uid      = 1;
+      $file->status   = 0;
+      file_save($file);
+      break;
+  }
+  return $uri;
 }

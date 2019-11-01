@@ -10,7 +10,7 @@ use Drupal\excel_import\Entity\MappingEntity;
 use Drupal\excel_import\Parser\PHPExcelParser;
 
 /**
- * Page callback for the import overview page.
+ * Page callback for a specific import overview page.
  * @param $import_type
  * @return array
  */
@@ -23,7 +23,7 @@ function excel_import__import_overview_page($import_type) {
   $return['add_form'] = [
     '#theme' => 'fieldset',
     '#children' => drupal_render($form),
-    '#title' => t('+ Upload file for import'),
+    '#title' => t('+ Source for import'),
     '#attributes' => [
       'class' => ['import-file-add-fieldset', 'collapsible', 'collapsed'],
     ],
@@ -50,9 +50,7 @@ function excel_import__review_page($import_file) {
     '#markup' => l(t('Back to overview'), 'admin/content/import'),
   ];
 
-  $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $import_file);
-  $file_data = $wrapper->field_import_file->value();
-  $uri = drupal_realpath($file_data['uri']);
+  $uri = excel_import_get_uri($import_file);
 
   $header_keys = TRUE;
   $parser = new PHPExcelParser($uri, $header_keys);
@@ -92,17 +90,19 @@ function excel_import__import_page($import_file) {
   $wrapper = entity_metadata_wrapper(ImportFileEntity::ENTITY_TYPE, $import_file);
   $import_type = $wrapper->field_import_type->value();
   $mapping_entity = excel_import_load_mapping($import_type);
+  // Redirect to mapping definition is there is none defined.
+  if (empty($mapping_entity)){
+    drupal_set_message(t('A mapping should be defined, before import run.'), 'error');
+    $type_url_str = excel_import_machine_name($import_type->title);
+    drupal_goto('admin/content/import/' . $type_url_str . '/mapping');
+  }
   $mapping_wrapper = entity_metadata_wrapper(MappingEntity::ENTITY_TYPE, $mapping_entity);
   $mapping_data = $mapping_wrapper->field_mapping->value();
 
   $destination_data = $wrapper->field_import_type->field_destination_bundle->value();
-  // @TODO: Make import processors into plugins.
   $import_processor = $wrapper->field_import_type->field_import_processor->value();
 
-  // Get the file uri.
-  $file_data = $wrapper->field_import_file->value();
-  $uri = drupal_realpath($file_data['uri']);
-
+  $uri = excel_import_get_uri($import_file);
   // Get the number of records in the file.
   $header_keys = TRUE;
   $parser = new PHPExcelParser($uri, $header_keys);

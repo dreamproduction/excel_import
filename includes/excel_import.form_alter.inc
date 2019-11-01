@@ -26,6 +26,9 @@ function excel_import_alter_import_file_add_form(&$form, &$form_state, $form_id)
   unset($form['field_import_status']);
   $wrapper->field_import_status->set('not_imported');
 
+  // Hide the date from the form.
+  $form['field_import_date']['#access'] = FALSE;
+
   $form['title']['#access'] = FALSE;
 
   // We only hide the import type field if we have an import type provided.
@@ -35,6 +38,20 @@ function excel_import_alter_import_file_add_form(&$form, &$form_state, $form_id)
     // Hide the import type field, and set it to the provided import type.
     unset($form['field_import_type']);
     $wrapper->field_import_type->set($import_type->id);
+  }
+
+  // Show/hide the import source based on its type.
+  if (isset($form['field_import_source'])){
+    $form['field_import_file']['#states'] = array(
+      'visible' => array(
+        ':input[name="field_import_source[und]"]' => array('value' => 'file'),
+      ),
+    );
+    $form['field_import_url']['#states'] = array(
+      'visible' => array(
+        ':input[name="field_import_source[und]"]' => array('value' => 'url'),
+      ),
+    );
   }
 }
 

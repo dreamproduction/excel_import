@@ -19,7 +19,7 @@ class Header extends BaseSource {
    * Header constructor.
    * @param $uri
    */
-  public function __construct($uri) {
+  public function __construct($uri = NULL) {
     $this->setUri($uri);
   }
 
@@ -74,7 +74,7 @@ class Header extends BaseSource {
     $this->header = $header;
   }
 
-  public static function getValue($row, $key) {
+  public static function getValue($row, $key, $import_file) {
     return $row[$key];
   }
 }

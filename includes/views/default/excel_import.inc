@@ -28,43 +28,61 @@ $handler->display->display_options['pager']['options']['offset'] = '0';
 $handler->display->display_options['pager']['options']['id'] = '0';
 $handler->display->display_options['pager']['options']['quantity'] = '9';
 $handler->display->display_options['style_plugin'] = 'table';
-$handler->display->display_options['style_options']['columns'] = [
+$handler->display->display_options['style_options']['columns'] = array(
   'id' => 'id',
-];
+);
 $handler->display->display_options['style_options']['default'] = '-1';
-$handler->display->display_options['style_options']['info'] = [
-  'id' => [
+$handler->display->display_options['style_options']['info'] = array(
+  'id' => array(
     'sortable' => 0,
     'default_sort_order' => 'asc',
     'align' => '',
     'separator' => '',
     'empty_column' => 0,
-  ],
-];
+  ),
+);
 $handler->display->display_options['style_options']['sticky'] = TRUE;
-/* Field: Import file: Id */
+/* Field: Import source: Id */
 $handler->display->display_options['fields']['id']['id'] = 'id';
 $handler->display->display_options['fields']['id']['table'] = 'eck_excel_import';
 $handler->display->display_options['fields']['id']['field'] = 'id';
-/* Field: Import file: Title */
+/* Field: Import source: Title */
 $handler->display->display_options['fields']['title']['id'] = 'title';
 $handler->display->display_options['fields']['title']['table'] = 'eck_excel_import';
 $handler->display->display_options['fields']['title']['field'] = 'title';
-/* Field: Import file: Import status */
+/* Field: Import source: Import source */
+$handler->display->display_options['fields']['field_import_source']['id'] = 'field_import_source';
+$handler->display->display_options['fields']['field_import_source']['table'] = 'field_data_field_import_source';
+$handler->display->display_options['fields']['field_import_source']['field'] = 'field_import_source';
+$handler->display->display_options['fields']['field_import_source']['label'] = 'Source';
+$handler->display->display_options['fields']['field_import_source']['empty'] = 'File';
+/* Field: Import source: Import status */
 $handler->display->display_options['fields']['field_import_status']['id'] = 'field_import_status';
 $handler->display->display_options['fields']['field_import_status']['table'] = 'field_data_field_import_status';
 $handler->display->display_options['fields']['field_import_status']['field'] = 'field_import_status';
-/* Field: Import file: Review link */
+/* Field: Import source: Import date */
+$handler->display->display_options['fields']['field_import_date']['id'] = 'field_import_date';
+$handler->display->display_options['fields']['field_import_date']['table'] = 'field_data_field_import_date';
+$handler->display->display_options['fields']['field_import_date']['field'] = 'field_import_date';
+$handler->display->display_options['fields']['field_import_date']['settings'] = array(
+  'format_type' => 'short',
+  'fromto' => 'both',
+  'multiple_number' => '',
+  'multiple_from' => '',
+  'multiple_to' => '',
+  'show_remaining_days' => 0,
+);
+/* Field: Import source: Review link */
 $handler->display->display_options['fields']['review_link']['id'] = 'review_link';
 $handler->display->display_options['fields']['review_link']['table'] = 'eck_excel_import';
 $handler->display->display_options['fields']['review_link']['field'] = 'review_link';
 $handler->display->display_options['fields']['review_link']['label'] = 'Review';
-/* Field: Import file: Import link */
+/* Field: Import source: Import link */
 $handler->display->display_options['fields']['import_link']['id'] = 'import_link';
 $handler->display->display_options['fields']['import_link']['table'] = 'eck_excel_import';
 $handler->display->display_options['fields']['import_link']['field'] = 'import_link';
 $handler->display->display_options['fields']['import_link']['label'] = 'Import';
-/* Field: Import file: Delete link */
+/* Field: Import source: Delete link */
 $handler->display->display_options['fields']['delete_link']['id'] = 'delete_link';
 $handler->display->display_options['fields']['delete_link']['table'] = 'eck_excel_import';
 $handler->display->display_options['fields']['delete_link']['field'] = 'delete_link';
@@ -78,14 +96,14 @@ $handler->display->display_options['arguments']['field_import_type_target_id']['
 $handler->display->display_options['arguments']['field_import_type_target_id']['summary']['number_of_records'] = '0';
 $handler->display->display_options['arguments']['field_import_type_target_id']['summary']['format'] = 'default_summary';
 $handler->display->display_options['arguments']['field_import_type_target_id']['summary_options']['items_per_page'] = '25';
-/* Filter criterion: Import file: excel_import type */
+/* Filter criterion: Import source: excel_import type */
 $handler->display->display_options['filters']['type']['id'] = 'type';
 $handler->display->display_options['filters']['type']['table'] = 'eck_excel_import';
 $handler->display->display_options['filters']['type']['field'] = 'type';
-$handler->display->display_options['filters']['type']['value'] = [
+$handler->display->display_options['filters']['type']['value'] = array(
   'excel_import' => 'excel_import',
-];
-$translatables['excel_import'] = [
+);
+$translatables['excel_import'] = array(
   t('Master'),
   t('more'),
   t('Apply'),
@@ -104,9 +122,12 @@ $translatables['excel_import'] = [
   t('.'),
   t(','),
   t('Title'),
+  t('Source'),
+  t('File'),
   t('Import status'),
+  t('Import date'),
   t('Review'),
   t('Import'),
   t('Delete'),
   t('All'),
-];
+);

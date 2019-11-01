@@ -9,7 +9,7 @@ class ImportFileEntity extends BaseEntity {
 
   protected function getEntityTypeDefinition() {
     return [
-      'label' => 'Import file',
+      'label' => 'Import source',
       'properties' => [
         'title' => [
           'label' => 'Title',
@@ -32,12 +32,32 @@ class ImportFileEntity extends BaseEntity {
 
   protected function getBundleDefinition() {
     return [
-      'label' => 'Import file',
+      'label' => 'Import source',
     ];
   }
 
   protected function getFieldsDefinition() {
     return [
+      'field_import_source' => [
+        'type' => 'list_text',
+        'field' => [
+          'field_name' => 'field_import_source',
+          'settings' => [
+            'allowed_values' => [
+              IMPORT_SOURCE_FILE => 'Import from File',
+              IMPORT_SOURCE_URL => 'Import from URL',
+            ],
+          ],
+        ],
+        'instance' => [
+          'label' => 'Import source',
+          'required' => TRUE,
+          'widget' => [
+            'type' => ' options_buttons',
+          ],
+          'default_value' => [['value' => 'file']],
+        ],
+      ],
       'field_import_file' => [
         'type' => 'file',
         'field' => [
@@ -48,7 +68,7 @@ class ImportFileEntity extends BaseEntity {
         ],
         'instance' => [
           'label' => 'Import file',
-          'required' => TRUE,
+          'required' => FALSE,
           'widget' => [
             'type' => 'file_generic',
           ],
@@ -57,6 +77,27 @@ class ImportFileEntity extends BaseEntity {
             'file_extensions' => 'xls xlsx',
           ],
         ]
+      ],
+      'field_import_url' => [
+        'type' => 'link_field',
+        'field' => [
+          'field_name' => 'field_import_url',
+          'settings' => [
+            'attributes' => [
+              'target' => 'default',
+            ],
+          ],
+        ],
+        'instance' => [
+          'label' => 'Import URL',
+          'required' => FALSE,
+          'widget' => [
+            'type' => ' link_field',
+          ],
+          'settings' => [
+            'title' => 'none',
+          ]
+        ],
       ],
       'field_import_type' => [
         'type' => 'entityreference',
@@ -109,6 +150,35 @@ class ImportFileEntity extends BaseEntity {
             'type' => ' options_buttons',
           ],
           'default_value' => [['value' => 'not_imported']],
+        ],
+      ],
+      'field_import_date' => [
+        'type' => 'datestamp',
+        'field' => [
+          'field_name' => 'field_import_date',
+          'settings' => [
+            'todate' => '',
+            'granularity' => [
+              'day' => 'day',
+              'month' => 'month',
+              'year' => 'year',
+              'hour' => 'hour',
+              'minute' => 'minute',
+              'second' => 'second',
+            ],
+            'tz_handling' => 'site',
+            'timezone_db' => 'UTC',
+          ],
+        ],
+        'instance' => [
+          'label' => 'Import date',
+          'widget' => [
+            'type' => 'date_popup',
+            'settings' => [
+              'input_format' => 'Y-m-d H:i:s',
+              'default_value' => 'blank',
+            ],
+          ],
         ],
       ],
     ];
